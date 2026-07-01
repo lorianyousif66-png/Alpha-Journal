@@ -175,8 +175,27 @@ details.steps li{font-size:13px;line-height:1.5;color:var(--text);margin-bottom:
 .restbar button{background:transparent;border:1px solid var(--inv-fg);color:var(--inv-fg);border-radius:8px;padding:7px 11px;font-weight:600;font-size:12px;cursor:pointer;}
 
 .nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;display:grid;grid-template-columns:repeat(5,1fr);background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);}
-.navbtn{background:none;border:none;color:var(--muted);font-weight:600;font-size:11px;padding:14px 0 16px;cursor:pointer;border-top:2px solid transparent;margin-top:-1px;}
+.navbtn{background:none;border:none;color:var(--muted);font-weight:600;font-size:10px;padding:10px 0 12px;cursor:pointer;border-top:2px solid transparent;margin-top:-1px;}
 .navbtn--on{color:var(--text);border-top-color:var(--text);}
+.navbtn svg{width:21px;height:21px;display:block;margin:0 auto 4px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+/* PR / Rekorde */
+.prlist{display:flex;flex-direction:column;gap:8px;margin:10px 0;width:100%;text-align:left;}
+.pritem{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:9px 12px;}
+.prstar{font-size:16px;}
+.prname{font-weight:600;font-size:14px;}
+.prdet{font-size:12px;color:var(--muted);}
+.prdet b{color:var(--text);}
+.prold{color:var(--muted);}
+/* Kalorien-Ring */
+.ringwrap{position:relative;width:150px;margin:4px auto 0;}
+.ring{display:block;width:100%;}
+.ringtxt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.rt-num{font-weight:800;font-size:30px;line-height:1;}
+.rt-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+.rt-left{font-size:11px;color:var(--muted);margin-top:4px;font-weight:600;}
+/* Bibliothek-Filter */
+.libchips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:10px;-webkit-overflow-scrolling:touch;}
+.libchips .chip{flex:none;padding:9px 12px;font-size:13px;}
 .scan-added{background:var(--surface2);border:1px solid var(--line);border-radius:9px;padding:10px 12px;font-size:13px;line-height:1.4;margin-bottom:12px;}
 .scan{position:fixed;inset:0;background:#000;z-index:200;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:calc(20px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom));}
 .scan.on{display:flex;}
@@ -216,52 +235,128 @@ const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const EXLIB={
 "Beine":[
  ["Kniebeuge","Stange auf dem oberen Rücken, Füße schulterbreit.","Hüfte nach hinten, kontrolliert absenken bis Oberschenkel parallel.","Über die Fersen hochdrücken, Rumpf fest."],
+ ["Frontkniebeuge","Stange vorn auf den Schultern, Ellenbogen hoch.","Aufrecht bleiben, tief absenken.","Kontrolliert hochdrücken, Ellenbogen oben halten."],
+ ["Goblet Squat","KH/Kettlebell mit beiden Händen vor der Brust.","Tief in die Hocke, Knie nach außen.","Über die Fersen hoch, Brust raus."],
  ["Beinpresse","In den Sitz, Füße schulterbreit auf die Platte.","Knie kontrolliert Richtung Brust beugen (~90°).","Ohne Schwung wegdrücken, Knie nicht ganz durchstrecken."],
+ ["Hackenschmidt-Maschine","Schultern unter die Polster, Füße mittig.","Kontrolliert tief beugen.","Ohne Schwung hochdrücken."],
  ["Ausfallschritte","Großer Schritt nach vorn, Oberkörper aufrecht.","Hinteres Knie Richtung Boden senken.","Über die vordere Ferse hochdrücken, Seite wechseln."],
+ ["Bulgarian Split Squat","Hinterer Fuß erhöht auf Bank, vorderes Bein weit vorn.","Tief absenken, Knie stabil über dem Fuß.","Über die vordere Ferse hoch, Seite wechseln."],
+ ["Step-Ups","Vor eine Box/Bank stellen, ein Fuß komplett drauf.","Über das obere Bein hochdrücken.","Langsam absteigen, Seite wechseln."],
+ ["Kreuzheben","Stange über der Fußmitte, Griff schulterbreit.","Rücken gerade, Brust raus — Stange am Körper hochziehen.","Hüfte strecken, oben nicht überstrecken, kontrolliert ab."],
  ["Rumän. Kreuzheben","Stange/KH vor den Oberschenkeln, leichte Kniebeuge.","Hüfte nach hinten schieben, Rücken gerade, Stange nah am Bein.","Bei Dehnung in den Beinbeugern stoppen, Hüfte nach vorn strecken."],
+ ["Sumo-Kreuzheben","Breiter Stand, Zehen nach außen, Griff innen.","Rücken gerade, über die Fersen hochdrücken.","Hüfte strecken, kontrolliert ablassen."],
  ["Beinbeuger (Maschine)","Bäuche der Beine auf die Rolle, Beine gestreckt.","Fersen zum Gesäß ziehen.","Langsam zurücklassen."],
  ["Beinstrecker (Maschine)","Sitzen, Rolle über den Knöcheln.","Beine gegen den Widerstand strecken.","Oben kurz halten, langsam ablassen."],
+ ["Adduktoren (Maschine)","Sitzen, Beine an die Polster.","Beine gegen den Widerstand zusammenführen.","Langsam öffnen."],
+ ["Abduktoren (Maschine)","Sitzen, Beine innen an den Polstern.","Beine gegen den Widerstand öffnen.","Langsam zurück."],
  ["Wadenheben","Ballen auf eine Erhöhung, Fersen frei.","So hoch wie möglich auf die Zehen.","Langsam absenken bis unter Ausgangshöhe."],
+ ["Wadenheben sitzend","Sitzend, Polster auf den Knien, Ballen auf Erhöhung.","Fersen so hoch wie möglich drücken.","Langsam tief absenken."],
+ ["Wandsitz","Rücken an die Wand, Beine im 90°-Winkel.","Position halten, Rumpf fest.","Gleichmäßig atmen."],
+],
+"Po":[
+ ["Hip Thrust","Oberer Rücken auf Bank, Stange/Gewicht auf der Hüfte.","Hüfte nach oben strecken bis Körper gerade.","Po oben fest anspannen, langsam ab."],
+ ["Glute Bridge","Rücklings, Füße aufgestellt.","Hüfte anheben, Po anspannen.","Oben 1–2 Sek. halten, langsam ab."],
+ ["Kickbacks (Kabel)","Manschette am Knöchel, leicht vorgebeugt.","Bein gestreckt nach hinten führen.","Po anspannen, langsam zurück."],
+ ["Good Mornings","Stange auf dem Rücken, leichte Kniebeuge.","Oberkörper mit geradem Rücken nach vorn kippen.","Über die Hüfte wieder aufrichten."],
 ],
 "Brust":[
  ["Bankdrücken","Auf der Bank, Stange über der Brust, Schulterblätter zusammen.","Kontrolliert zur unteren Brust absenken.","Explosiv nach oben drücken."],
  ["Schrägbankdrücken","Bank auf 30–45°, Stange/KH über oberer Brust.","Zur oberen Brust absenken.","Gerade nach oben drücken."],
+ ["Negativ-Bankdrücken","Bank leicht negativ geneigt.","Stange zur unteren Brust absenken.","Kraftvoll hochdrücken."],
  ["Kurzhantel-Bankdrücken","Flach liegen, KH über der Brust.","Tief absenken bis Dehnung, Ellenbogen ~45°.","Zusammen nach oben drücken."],
+ ["Schräg-KH-Drücken","Bank auf 30–45°, KH über der oberen Brust.","Tief absenken bis Dehnung.","Nach oben zusammenführen."],
  ["Liegestütze","Hände etwas breiter als Schultern, Körper gerade.","Brust Richtung Boden senken.","Hochdrücken, Rumpf fest."],
+ ["Enge Liegestütze","Hände unter den Schultern, Ellenbogen eng.","Tief absenken, Körper gerade.","Hochdrücken — mehr Trizeps."],
  ["Butterfly / Kabel-Fly","Griffe auf Brusthöhe, leichte Ellenbogenbeugung.","Arme im Bogen vor der Brust zusammenführen.","Langsam öffnen bis Brustdehnung."],
+ ["KH-Fliegende","Flach liegen, KH über der Brust, leichte Beugung.","Arme weit im Bogen öffnen bis Dehnung.","Im Bogen wieder zusammenführen."],
+ ["Dips (Barren)","Auf Barrenholmen abstützen, leicht vorgelehnt.","Tief absenken, Ellenbogen nach hinten.","Hochdrücken ohne Schwung."],
+ ["Brustpresse (Maschine)","Griffe auf Brusthöhe, Rücken am Polster.","Nach vorn drücken bis Arme fast gestreckt.","Langsam zurück."],
 ],
 "Rücken":[
  ["Latzug","Griff etwas breiter als Schultern, sitzen.","Stange zur oberen Brust ziehen, Ellenbogen nach unten.","Langsam nach oben lassen."],
+ ["Latzug (enger Griff)","Enger Parallelgriff, aufrecht sitzen.","Griff zur Brust ziehen, Ellenbogen eng.","Kontrolliert nach oben."],
  ["Klimmzüge","An die Stange hängen, Griff schulterbreit+.","Brust zur Stange ziehen.","Kontrolliert ganz ablassen."],
+ ["Klimmzüge (Untergriff)","Handflächen zu dir, schulterbreit.","Kinn über die Stange ziehen.","Langsam ganz ablassen — mehr Bizeps."],
+ ["Negativ-Klimmzüge","Mit Sprung/Box oben starten, Kinn über der Stange.","So langsam wie möglich ablassen (3–5 Sek.).","Wieder hochsteigen, wiederholen."],
  ["Rudern (Kabel)","Sitzen, Griff mit gestreckten Armen.","Zum Bauch ziehen, Schulterblätter zusammen.","Langsam zurückführen."],
  ["Langhantelrudern","Hüfte gebeugt, Rücken gerade, Stange hängend.","Zum unteren Bauch ziehen.","Kontrolliert ablassen."],
  ["Kurzhantelrudern (einarmig)","Ein Knie/Hand auf Bank, KH hängt.","KH zur Hüfte ziehen, Ellenbogen eng.","Langsam senken, dann Seite wechseln."],
+ ["T-Bar-Rudern","Über der Stange stehen, Rücken gerade.","Griff zur Brust ziehen.","Langsam ablassen."],
+ ["Rudern (Maschine)","Brust ans Polster, Griffe fassen.","Zurückziehen, Schulterblätter zusammen.","Kontrolliert nach vorn."],
+ ["Überzüge (Pullover)","Rücklings auf Bank, KH über der Brust.","Gestreckt hinter den Kopf absenken.","Im Bogen zurück über die Brust."],
+ ["Hyperextensions","Hüfte auf dem Polster, Füße fixiert.","Oberkörper kontrolliert absenken.","Mit geradem Rücken hochkommen, nicht überstrecken."],
+ ["Face Pulls","Seil auf Gesichtshöhe am Kabel.","Zum Gesicht ziehen, Ellenbogen hoch und außen.","Langsam zurück — gut für die Haltung."],
+ ["Shrugs","KH/Stange hängen lassen.","Schultern gerade nach oben ziehen.","Oben kurz halten, langsam ab."],
 ],
 "Schultern":[
  ["Schulterdrücken (KH)","Sitzend, KH auf Schulterhöhe.","Über den Kopf drücken bis fast gestreckt.","Kontrolliert absenken."],
+ ["Schulterdrücken (LH)","Stange auf Schlüsselbeinhöhe, stehend.","Über den Kopf drücken, Kopf leicht zurück.","Kontrolliert zur Ausgangsposition."],
+ ["Arnold Press","KH vor der Brust, Handflächen zu dir.","Beim Drücken die Hände nach außen drehen.","Rückwärts wieder absenken."],
  ["Seitheben","KH neben dem Körper, leichte Ellenbogenbeugung.","Arme seitlich bis Schulterhöhe heben.","Langsam senken, kein Schwung."],
+ ["Seitheben (Kabel)","Griff in der Hand, Kabel unten seitlich.","Arm seitlich bis Schulterhöhe heben.","Langsam ab, konstante Spannung."],
  ["Frontheben","KH vor den Oberschenkeln.","Arm gerade nach vorn bis Schulterhöhe.","Langsam ablassen."],
  ["Reverse Fly","Vorgebeugt, KH hängen, leichte Beugung.","Arme seitlich nach hinten/oben führen.","Schulterblätter zusammen, langsam zurück."],
+ ["Reverse Butterfly (Maschine)","Brust ans Polster, Griffe vorn fassen.","Arme im Bogen nach hinten öffnen.","Langsam zurück — hintere Schulter."],
+ ["Upright Rows","Stange/KH eng gefasst vor dem Körper.","Entlang des Körpers bis Brusthöhe ziehen.","Ellenbogen führen, langsam ab."],
 ],
-"Arme":[
+"Bizeps":[
  ["Bizeps-Curls (KH)","KH neben dem Körper, Handflächen vorn.","Ohne Schwung zur Schulter curlen.","Langsam absenken."],
  ["Hammer-Curls","KH mit Handflächen zueinander.","Zur Schulter curlen.","Langsam senken."],
  ["Langhantel-Curls","Stange schulterbreit, Ellenbogen am Körper.","Zur Brust curlen.","Kontrolliert ablassen."],
+ ["SZ-Curls","SZ-Stange im Untergriff, Ellenbogen fixiert.","Zur Brust curlen.","Langsam ablassen — schont die Handgelenke."],
+ ["Konzentrations-Curls","Sitzend, Ellenbogen an der Oberschenkel-Innenseite.","KH kontrolliert zur Schulter curlen.","Ganz langsam strecken."],
+ ["Scott-Curls","Oberarme auf dem Scott-Polster.","Stange/KH nach oben curlen.","Langsam bis fast gestreckt ab."],
+ ["Kabel-Curls","Griff am unteren Kabel, Ellenbogen am Körper.","Nach oben curlen.","Langsam ab, Spannung halten."],
+],
+"Trizeps":[
  ["Trizeps-Drücken (Kabel)","Seil/Stange oben, Ellenbogen eng am Körper.","Nach unten strecken bis Arme gerade.","Langsam nach oben lassen."],
  ["Trizeps-Dips","Hände auf Bank hinter dir, Beine vorn.","Körper absenken, Ellenbogen nach hinten.","Hochdrücken."],
+ ["French Press","Rücklings, SZ-Stange/KH über der Stirn.","Nur die Unterarme beugen, Ellenbogen stabil.","Nach oben strecken."],
+ ["Überkopf-Trizeps (KH)","KH mit beiden Händen hinter dem Kopf.","Arme nach oben strecken.","Langsam hinter den Kopf ab."],
+ ["Kickbacks (Trizeps)","Vorgebeugt, Oberarm parallel zum Boden.","Unterarm nach hinten strecken.","Langsam beugen, Oberarm ruhig."],
+ ["Enges Bankdrücken","Stange etwas enger als schulterbreit.","Zur unteren Brust ab, Ellenbogen eng.","Hochdrücken — Trizeps arbeitet."],
 ],
 "Core":[
  ["Plank","Unterarme und Zehen am Boden, Körper gerade.","Bauch und Po anspannen.","Position halten, nicht durchhängen."],
+ ["Seitstütz","Auf einem Unterarm, Körper seitlich gerade.","Hüfte oben halten.","Seite wechseln."],
  ["Crunches","Rücklings, Knie gebeugt, Hände an den Schläfen.","Schulterblätter vom Boden heben.","Langsam ablassen."],
+ ["Sit-Ups","Rücklings, Knie gebeugt, Füße fixiert.","Oberkörper ganz aufrichten.","Kontrolliert abrollen."],
  ["Beinheben","Rücklings, Beine gestreckt.","Beine gerade nach oben heben.","Langsam senken, ohne abzulegen."],
+ ["Hängendes Beinheben","An die Klimmzugstange hängen.","Knie/Beine Richtung Brust ziehen.","Langsam ohne Schwung ablassen."],
  ["Russian Twist","Sitzend, Oberkörper leicht zurück, Füße frei.","Gewicht von Seite zu Seite drehen.","Kontrolliert, Rumpf fest."],
  ["Mountain Climbers","Liegestützposition.","Knie abwechselnd schnell zur Brust ziehen.","Rücken gerade halten."],
+ ["Dead Bug","Rücklings, Arme hoch, Beine 90°.","Gegengleich Arm und Bein strecken.","Unterer Rücken bleibt am Boden."],
+ ["Bird Dog","Vierfüßlerstand.","Gegengleich Arm und Bein strecken.","Kurz halten, ruhig wechseln."],
+ ["Ab-Rollout","Kniend, Ab-Roller/Langhantel vor dir.","Langsam nach vorn rollen, Rumpf fest.","Kontrolliert zurückziehen."],
+ ["Cable Crunch","Kniend vor dem Kabel, Seil hinterm Kopf.","Oberkörper einrollen Richtung Boden.","Langsam aufrichten."],
+ ["Bauchpresse (Maschine)","In die Maschine setzen, Griffe fassen.","Oberkörper gegen den Widerstand einrollen.","Langsam zurück."],
+],
+"Ganzkörper / Zuhause":[
+ ["Burpees","Aus dem Stand in die Liegestützposition springen.","Liegestütz, dann Füße zur Brust ziehen.","Explosiv hochspringen, direkt weiter."],
+ ["Kettlebell Swings","Kettlebell mit beiden Händen, Hüfte gebeugt.","Aus der Hüfte nach vorn schwingen bis Brusthöhe.","Kontrolliert zurück zwischen die Beine."],
+ ["Thrusters","KH auf Schulterhöhe, tiefe Kniebeuge.","Beim Hochkommen direkt über den Kopf drücken.","Absenken und wiederholen."],
+ ["Farmer's Walk","Schwere KH in beiden Händen.","Aufrecht und mit festen Schultern gehen.","Strecke oder Zeit halten."],
+ ["Bergsteiger-Sprünge","Ausfallschritt-Position.","Explosiv springen und Beine wechseln.","Weich landen, Rhythmus halten."],
+ ["Superman","Bäuchlings, Arme nach vorn.","Arme und Beine gleichzeitig anheben.","Kurz halten, langsam ab."],
 ],
 "Cardio":[
  ["Joggen / Laufband","Lockeres Tempo, aufrechte Haltung.","20–30 Min gleichmäßig.","Nach Gefühl steigern."],
  ["Rudergerät","Kräftig mit den Beinen abdrücken.","Dann Rumpf und Arme nachziehen.","Kontrolliert zurückgleiten."],
  ["Ergometer / Fahrrad","Sattelhöhe passend einstellen.","Gleichmäßig treten, moderates Tempo.","20–40 Min."],
+ ["Crosstrainer","Aufrechte Haltung, ganze Fußsohle.","Gleichmäßig, Arme aktiv mitziehen.","20–40 Min moderat."],
+ ["Stairmaster / Treppe","Aufrecht, nicht aufstützen.","Gleichmäßiges Tempo.","10–20 Min."],
  ["Seilspringen","Handgelenke drehen, kleine Sprünge.","Gleichmäßiger Rhythmus.","Intervalle von 1–2 Min."],
+ ["HIIT-Intervalle","30 Sek. hohes Tempo (Sprint/Rad).","90 Sek. locker erholen.","6–10 Runden."],
+ ["Schwimmen","Bahnen in ruhigem Tempo.","Technik vor Geschwindigkeit.","15–30 Min."],
+ ["Spazieren (zügig)","Zügiges Tempo, aufrecht.","30–60 Min — auch nach der Schicht gut.","Regeneration + Kalorienverbrauch."],
+],
+"Mobility / Dehnen":[
+ ["Katze-Kuh","Vierfüßlerstand.","Rücken abwechselnd rund und ins Hohlkreuz.","Langsam mit der Atmung."],
+ ["Weltbester Stretch","Tiefer Ausfallschritt, Hand innen aufsetzen.","Anderen Arm zur Decke aufdrehen.","Seite wechseln."],
+ ["Hüftbeuger-Dehnung","Kniender Ausfallschritt.","Hüfte nach vorn schieben, Oberkörper aufrecht.","30–45 Sek. pro Seite."],
+ ["Schulterkreisen (Band)","Band/Besenstiel weit fassen.","Gestreckt über den Kopf nach hinten führen.","Langsam zurück, Griff ggf. enger."],
+ ["Beinbeuger-Dehnung","Sitzend, ein Bein gestreckt.","Mit geradem Rücken nach vorn lehnen.","30–45 Sek. pro Seite."],
+ ["Brust-Dehnung (Türrahmen)","Unterarm an den Türrahmen, Ellenbogen 90°.","Leicht nach vorn drehen bis Dehnung.","30 Sek. pro Seite."],
 ],
 };
 
@@ -419,7 +514,7 @@ function generatePlan(focus,days){
  });
 }
 
-const K={plan:"hermes:plan",settings:"hermes:settings",profile:"hermes:profile",weight:"hermes:bw",history:"hermes:hist",last:"hermes:last",nextDay:"hermes:next",shifts:"hermes:shifts",food:"hermes:food",water:"hermes:water",custom:"hermes:custom"};
+const K={plan:"hermes:plan",settings:"hermes:settings",profile:"hermes:profile",weight:"hermes:bw",history:"hermes:hist",last:"hermes:last",nextDay:"hermes:next",shifts:"hermes:shifts",food:"hermes:food",water:"hermes:water",custom:"hermes:custom",pr:"hermes:pr"};
 function load(k,fb){try{const v=localStorage.getItem(k);return v?JSON.parse(v):fb;}catch{return fb;}}
 function save(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){console.error(e);}}
 const todayKey=()=>new Date().toISOString().slice(0,10);
@@ -433,7 +528,7 @@ const state={
  plan:load(K.plan,defaultPlan()),
  settings:Object.assign({theme:"obsidian",rest:90,protein:1.9},load(K.settings,{})),
  profile:Object.assign({sex:"m",age:30,height:180,activity:1.375,goal:"abnehmen"},load(K.profile,{})),
- bodyweight:load(K.weight,[]),history:load(K.history,[]),lastBest:load(K.last,{}),
+ bodyweight:load(K.weight,[]),history:load(K.history,[]),lastBest:load(K.last,{}),prs:load(K.pr,{}),lastPRs:[],
  nextDayId:load(K.nextDay,null),shiftByDate:load(K.shifts,{}),
  foodLog:load(K.food,{}),waterLog:load(K.water,{}),customFoods:load(K.custom,[]),
  trainDayId:null,log:null,saved:false,note:"",acc:{},rest:{active:false,left:0,timer:null},
@@ -481,9 +576,20 @@ function render(){
  const v={heute:viewHeute,training:viewTraining,essen:viewEssen,gewicht:viewGewicht,mehr:viewMehr}[state.tab];
  main.innerHTML=v();renderNav();wire();window.scrollTo(0,0);
 }
+const NAVICONS={
+ heute:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg>',
+ training:'<svg viewBox="0 0 24 24"><path d="M6.5 6.5v11M17.5 6.5v11M3 9.5v5M21 9.5v5M6.5 12h11"/></svg>',
+ essen:'<svg viewBox="0 0 24 24"><path d="M5 2v6a2.5 2.5 0 0 0 2.5 2.5h0A2.5 2.5 0 0 0 10 8V2M7.5 2v20M17 2c-1.7 1-3 3.6-3 6.5V12h3v10M17 2v20"/></svg>',
+ gewicht:'<svg viewBox="0 0 24 24"><path d="M3 20h18M4 16l5-5 4 3 7-8"/></svg>',
+ mehr:'<svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/><circle cx="9" cy="7" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="17" r="2"/></svg>',
+};
 function renderNav(){
  const t=[["heute","Heute"],["training","Training"],["essen","Essen"],["gewicht","Gewicht"],["mehr","Mehr"]];
- navEl.innerHTML=t.map(([id,l])=>`<button class="navbtn${state.tab===id?' navbtn--on':''}" data-tab="${id}">${l}</button>`).join("");
+ navEl.innerHTML=t.map(([id,l])=>`<button class="navbtn${state.tab===id?' navbtn--on':''}" data-tab="${id}">${NAVICONS[id]}${l}</button>`).join("");
+}
+function kcalRing(cons,tgt){
+ const R=54,C=2*Math.PI*R,pct=Math.min(1,tgt?cons/tgt:0),off=C*(1-pct),left=Math.round(tgt-cons);
+ return `<div class="ringwrap"><svg viewBox="0 0 140 140" class="ring"><circle cx="70" cy="70" r="${R}" fill="none" stroke="var(--surface2)" stroke-width="10"/><circle cx="70" cy="70" r="${R}" fill="none" stroke="var(--text)" stroke-width="10" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" transform="rotate(-90 70 70)"/></svg><div class="ringtxt"><div class="rt-num">${Math.round(cons)}</div><div class="rt-sub">/ ${Math.round(tgt)} kcal</div><div class="rt-left">${left>=0?left+" übrig":Math.abs(left)+" drüber"}</div></div></div>`;
 }
 function bar(label,cons,tgt,unit,over){
  const pct=tgt?Math.min(100,cons/tgt*100):0;
@@ -527,13 +633,15 @@ function viewTraining(){
   <section class="card"><div class="eyebrow">Plan bearbeiten</div>${planEditor()}</section>
  </div>`;
  if(state.trainView==="hist")return `<div class="stack">${nav}
+  ${prCard()}
   <section class="card"><div class="eyebrow">Trainings-Verlauf</div>${histEditor()}</section>
  </div>`;
  if(state.saved)return `<div class="stack">${nav}${viewDone()}</div>`;
  const days=state.plan.map(d=>`<button class="daybtn${state.trainDayId===d.id?' daybtn--on':''}" data-day="${d.id}">${esc(d.label)}${state.nextDayId===d.id?'<span class="dot">dran</span>':''}</button>`).join("");
  const exHtml=state.log.map((ex,ei)=>{
-  const u=UNITS[ex.unit]||UNITS.kg,noW=ex.unit!=="kg",lb=state.lastBest[ex.name];
-  let lbTxt="";if(lb){let t=lb.unit==="kg"?`${esc(lb.weight||"—")} kg × ${esc(lb.reps||"—")}`:`${esc(lb.reps||"—")} ${UNITS[lb.unit]?UNITS[lb.unit].r:""}`;lbTxt=`<div class="lastline">Letztes Mal: <b>${t}</b></div>`;}
+  const u=UNITS[ex.unit]||UNITS.kg,noW=ex.unit!=="kg",lb=state.lastBest[ex.name],pr=state.prs[ex.name];
+  let lbTxt="";if(lb){let t=lb.unit==="kg"?`${esc(lb.weight||"—")} kg × ${esc(lb.reps||"—")}`:`${esc(lb.reps||"—")} ${UNITS[lb.unit]?UNITS[lb.unit].r:""}`;lbTxt=`<div class="lastline">Letztes Mal: <b>${t}</b>${pr?` · ★ Rekord: <b>${esc(prTxt(pr))}</b>`:""}</div>`;}
+  else if(pr)lbTxt=`<div class="lastline">★ Rekord: <b>${esc(prTxt(pr))}</b></div>`;
   const rows=ex.sets.map((s,si)=>`<div class="setrow${s.done?' setrow--done':''}" data-row="${ei}-${si}"><span class="setnum">${si+1}</span><input class="inp" type="number" inputmode="decimal" placeholder="${noW?'—':'0'}" value="${esc(s.weight)}" ${noW?'disabled':''} data-f="weight" data-ei="${ei}" data-si="${si}"><input class="inp" type="number" inputmode="numeric" placeholder="0" value="${esc(s.reps)}" data-f="reps" data-ei="${ei}" data-si="${si}"><button class="check${s.done?' check--on':''}" data-check="${ei}-${si}">✓</button></div>`).join("");
   const steps=(ex.steps&&ex.steps.length)?`<details class="steps"><summary>Anleitung</summary><ol>${ex.steps.map(s=>`<li>${esc(s)}</li>`).join("")}</ol></details>`:"";
   return `<section class="card"><div class="ex-head"><div class="ex-name">${esc(ex.name)}</div><div class="ex-target">${ex.sets.length} × ${esc(ex.reps)}</div></div>${lbTxt}${steps}<div class="sethead"><span>Satz</span><span>${u.w}</span><span>${u.r}</span><span>✓</span></div>${rows}<button class="restbtn" data-startrest="1">⧖ Pause (${state.settings.rest}s)</button></section>`;
@@ -548,18 +656,41 @@ function viewTraining(){
   <p class="tip">Beim Wiedereinstieg: die ersten Wochen 2–3 Wdh. „im Tank" lassen.</p>
  </div>`;
 }
+function prTxt(p){return p.unit==="kg"?`${p.weight} kg × ${p.reps}`:`${p.reps} ${UNITS[p.unit]?UNITS[p.unit].r:""}`;}
+function prCard(){
+ const names=Object.keys(state.prs);
+ if(!names.length)return `<section class="card"><div class="eyebrow">★ Persönliche Rekorde</div><p class="muted sm">Speichere Einheiten mit Gewicht &amp; Wiederholungen — deine Bestwerte landen automatisch hier.</p></section>`;
+ const rows=names.sort((a,b)=>state.prs[b].date.localeCompare(state.prs[a].date)).map(n=>{const p=state.prs[n];return `<div class="pritem"><span class="prstar">★</span><div style="flex:1"><div class="prname">${esc(n)}</div><div class="prdet"><b>${esc(prTxt(p))}</b> · ${fmtFull(p.date)}</div></div><button class="del" data-delpr="${esc(n)}">✕</button></div>`;}).join("");
+ return `<section class="card"><div class="eyebrow">★ Persönliche Rekorde</div><div class="prlist">${rows}</div><p class="muted sm" style="margin-top:8px">Bei kg-Übungen zählt die stärkste Kombination aus Gewicht × Wiederholungen.</p></section>`;
+}
 function viewDone(){
  const order=state.plan.map(d=>d.id),i=order.indexOf(state.trainDayId),next=dayById(order[(i+1)%order.length]);
- return `<section class="card done"><div class="done-check">✓</div><div class="done-title">${esc(dayById(state.trainDayId).label)} gespeichert</div><p class="muted">Als Nächstes dran: <b style="color:var(--text)">${esc(next.label)}</b>. Gönn dir Erholung — du wächst in der Pause.</p><button class="btn" data-prepare="${next.id}">Nächste Einheit vorbereiten</button></section>`;
+ const prHtml=state.lastPRs.length?`<div class="prlist">${state.lastPRs.map(p=>`<div class="pritem"><span class="prstar">★</span><div><div class="prname">${esc(p.name)}</div><div class="prdet">Neuer Bestwert: <b>${esc(prTxt(p))}</b>${p.prev?` <span class="prold">(vorher ${esc(prTxt(p.prev))})</span>`:""}</div></div></div>`).join("")}</div>`:"";
+ return `<section class="card done"><div class="done-check">✓</div><div class="done-title">${esc(dayById(state.trainDayId).label)} gespeichert</div>${prHtml}<p class="muted">Als Nächstes dran: <b style="color:var(--text)">${esc(next.label)}</b>. Gönn dir Erholung — du wächst in der Pause.</p><button class="btn" data-prepare="${next.id}">Nächste Einheit vorbereiten</button></section>`;
 }
 function counts(){const done=state.log.reduce((a,ex)=>a+ex.sets.filter(s=>s.done).length,0);const total=state.log.reduce((a,ex)=>a+ex.sets.length,0);return {done,total};}
 function updateProgress(){const {done,total}=counts();const b=document.getElementById("progBar");if(b)b.style.width=(total?done/total*100:0)+"%";const t=document.getElementById("progTxt");if(t)t.textContent=`${done} / ${total} Sätze erledigt`;const s=document.getElementById("saveBtn");if(s)s.disabled=done===0;}
+/* PR-Wertung: bei kg zählt geschätztes 1RM (Epley: Gewicht × (1 + Wdh./30)),
+   sonst die beste Wiederholungs-/Sekunden-/Minutenzahl. */
+function setScore(unit,w,r){const wt=parseFloat(w)||0,rp=parseFloat(r)||0;if(unit==="kg")return wt>0&&rp>0?wt*(1+rp/30):0;return rp;}
+function checkPRs(){
+ const newPRs=[];const prs={...state.prs};const date=todayKey();
+ state.log.forEach(ex=>{
+  let best=null;
+  ex.sets.filter(s=>s.done).forEach(s=>{const sc=setScore(ex.unit,s.weight,s.reps);if(sc>0&&(!best||sc>best.score))best={score:sc,weight:s.weight,reps:s.reps};});
+  if(!best)return;
+  const old=prs[ex.name];
+  if(!old||best.score>old.score){prs[ex.name]={score:+best.score.toFixed(1),weight:best.weight,reps:best.reps,unit:ex.unit,date};newPRs.push({name:ex.name,weight:best.weight,reps:best.reps,unit:ex.unit,prev:old||null});}
+ });
+ state.prs=prs;save(K.pr,prs);state.lastPRs=newPRs;
+}
 function finish(){
  const date=new Date().toISOString(),d=dayById(state.trainDayId);
  state.history=[...state.history,{date,dayLabel:d.label,note:state.note,exercises:state.log}];save(K.history,state.history);
  const nb={...state.lastBest};
  state.log.forEach(ex=>{const done=ex.sets.filter(s=>s.done&&(s.weight||s.reps));if(done.length){const b=done[done.length-1];nb[ex.name]={weight:b.weight,reps:b.reps,unit:ex.unit};}});
  state.lastBest=nb;save(K.last,nb);
+ checkPRs();
  const order=state.plan.map(x=>x.id),i=order.indexOf(state.trainDayId);state.nextDayId=order[(i+1)%order.length];save(K.nextDay,state.nextDayId);
  state.note="";state.saved=true;stopRest();render();
 }
@@ -582,7 +713,8 @@ function viewEssen(){
  const micros=NUT.filter(n=>n.kind==="micro").map(n=>bar(n.l,con[n.k]||0,tg[n.k],n.u)).join("");
  return `<div class="stack">
   <section class="card">
-   <div class="kcal-big"><div class="n">${Math.round(con.kcal)}<span style="font-size:18px;color:var(--muted)"> / ${tg.kcal}</span></div><div class="l">Kalorien heute · Ziel bei „${{abnehmen:"Abnehmen",halten:"Halten",aufbau:"Aufbau",recomp:"Body Recomp"}[state.profile.goal]}"</div></div>
+   ${kcalRing(con.kcal,tg.kcal)}
+   <div class="kcal-big" style="padding-top:0"><div class="l">Kalorien heute · Ziel bei „${{abnehmen:"Abnehmen",halten:"Halten",aufbau:"Aufbau",recomp:"Body Recomp"}[state.profile.goal]}"</div></div>
    <button class="btn" data-foodpick="1" style="margin-top:6px">+ Essen hinzufügen</button>
   </section>
   <section class="card"><div class="eyebrow">Heute gegessen</div>${list}</section>
@@ -804,16 +936,19 @@ function viewLibrary(){
  const dayId=state.libFor;
  let html="";
  for(const g in EXLIB){
-  html+=`<div class="grouphdr">${g}</div>`;
-  html+=EXLIB[g].map(e=>{
+  const items=EXLIB[g].map(e=>{
    const steps=e.slice(1);
    return `<div class="exlib-item ex-item" data-name="${esc(e[0].toLowerCase())}"><div class="between"><div class="pn" style="font-weight:600">${esc(e[0])}</div><button class="pick-add" data-libadd="${esc(e[0])}">+</button></div><details class="steps"><summary>Anleitung</summary><ol>${steps.map(s=>`<li>${esc(s)}</li>`).join("")}</ol></details></div>`;
   }).join("");
+  html+=`<div class="libgroup" data-group="${esc(g)}"><div class="grouphdr">${esc(g)}</div>${items}</div>`;
  }
+ const total=Object.values(EXLIB).reduce((a,g)=>a+g.length,0);
+ const chips=`<div class="libchips"><button class="chip chip--on" data-libgroup="all">Alle</button>${Object.keys(EXLIB).map(g=>`<button class="chip" data-libgroup="${esc(g)}">${esc(g)}</button>`).join("")}</div>`;
  return `<div class="stack">
   <section class="card">
    <div class="between" style="margin-bottom:12px"><div class="eyebrow" style="margin:0">Übung hinzufügen zu „${esc(dayById(dayId).label)}"</div><button class="btn btn-ghost btn-sm" style="width:auto;padding:7px 12px" data-libback="1">Zurück</button></div>
-   <input class="searchbar" id="exSearch" placeholder="Übung suchen …">
+   <input class="searchbar" id="exSearch" placeholder="${total} Übungen durchsuchen …">
+   ${chips}
    <div id="exList">${html}</div>
   </section>
   <section class="card"><div class="eyebrow">Eigene Übung</div><div class="field"><label>Name</label><input class="inp" style="text-align:left" id="cxName" placeholder="z. B. Klimmzüge breit"></div><button class="btn" data-addcustomex="1">Hinzufügen</button></div>
@@ -881,6 +1016,7 @@ function wire(){
  main.querySelectorAll("[data-settheme]").forEach(b=>b.onclick=()=>{state.settings.theme=b.dataset.settheme;sS();applyTheme();render();});
  // history/data
  main.querySelectorAll("[data-delhist]").forEach(b=>b.onclick=()=>{state.history.splice(+b.dataset.delhist,1);save(K.history,state.history);render();});
+ main.querySelectorAll("[data-delpr]").forEach(b=>b.onclick=()=>{if(!confirm("Rekord für "+b.dataset.delpr+" löschen?"))return;const p={...state.prs};delete p[b.dataset.delpr];state.prs=p;save(K.pr,p);render();});
  const exp=main.querySelector("[data-export]");if(exp)exp.onclick=doExport;
  const imp=main.querySelector("[data-import]");if(imp)imp.onclick=doImport;
  const dl=main.querySelector("[data-download]");if(dl)dl.onclick=doDownload;
@@ -889,7 +1025,8 @@ function wire(){
  // library
  const lb=main.querySelector("[data-libback]");if(lb)lb.onclick=()=>{state.libFor=null;render();};
  main.querySelectorAll("[data-libadd]").forEach(b=>b.onclick=()=>{const name=b.dataset.libadd;addExerciseToDay(state.libFor,name,findExSteps(name));state.libFor=null;render();});
- const exs=document.getElementById("exSearch");if(exs)exs.oninput=()=>{const q=exs.value.toLowerCase();main.querySelectorAll(".ex-item").forEach(it=>{it.style.display=it.dataset.name.includes(q)?"":"none";});main.querySelectorAll(".grouphdr").forEach(h=>h.style.display=q?"none":"");};
+ const exs=document.getElementById("exSearch");if(exs)exs.oninput=()=>{const q=exs.value.toLowerCase();if(q){main.querySelectorAll(".libgroup").forEach(sec=>sec.style.display="");main.querySelectorAll("[data-libgroup]").forEach(x=>x.classList.toggle("chip--on",x.dataset.libgroup==="all"));}main.querySelectorAll(".ex-item").forEach(it=>{it.style.display=it.dataset.name.includes(q)?"":"none";});main.querySelectorAll(".grouphdr").forEach(h=>h.style.display=q?"none":"");};
+ main.querySelectorAll("[data-libgroup]").forEach(b=>b.onclick=()=>{const g=b.dataset.libgroup;main.querySelectorAll("[data-libgroup]").forEach(x=>x.classList.toggle("chip--on",x===b));main.querySelectorAll(".libgroup").forEach(sec=>{sec.style.display=(g==="all"||sec.dataset.group===g)?"":"none";});});
  const acx=main.querySelector("[data-addcustomex]");if(acx)acx.onclick=()=>{const nm=(document.getElementById("cxName").value||"").trim();if(!nm)return;addExerciseToDay(state.libFor,nm,[]);state.libFor=null;render();};
 }
 function findEx(di,ei){const d=dayById(di);return d?d.exercises.find(e=>e.id===ei):null;}
@@ -906,7 +1043,7 @@ function doFileImport(){const inp=document.getElementById("fileInput");if(!inp)r
 function reloadState(){
  state.plan=load(K.plan,defaultPlan());state.settings=Object.assign({theme:"obsidian",rest:90,protein:1.9},load(K.settings,{}));
  state.profile=Object.assign({sex:"m",age:30,height:180,activity:1.375,goal:"abnehmen"},load(K.profile,{}));
- state.bodyweight=load(K.weight,[]);state.history=load(K.history,[]);state.lastBest=load(K.last,{});
+ state.bodyweight=load(K.weight,[]);state.history=load(K.history,[]);state.lastBest=load(K.last,{});state.prs=load(K.pr,{});state.lastPRs=[];
  state.shiftByDate=load(K.shifts,{});state.nextDayId=load(K.nextDay,null);state.foodLog=load(K.food,{});state.waterLog=load(K.water,{});state.customFoods=load(K.custom,[]);
  if(!state.plan.length)state.plan=defaultPlan();if(!state.plan.find(d=>d.id===state.nextDayId))state.nextDayId=state.plan[0].id;
  state.trainDayId=state.nextDayId;state.log=buildLog(state.nextDayId);state.saved=false;state.note="";state.acc={};state.libFor=null;state.foodPicker=false;

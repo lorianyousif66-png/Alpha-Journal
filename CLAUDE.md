@@ -97,6 +97,7 @@ hermes:shifts    { "YYYY-MM-DD": shiftKey }
 hermes:food      { "YYYY-MM-DD": [foodEntries] }
 hermes:water     { "YYYY-MM-DD": ml }
 hermes:custom    eigene Lebensmittel
+hermes:pr        persönliche Rekorde { übungsname: {score, weight, reps, unit, date} }
 ```
 
 ## Datenmodelle
@@ -116,7 +117,14 @@ hermes:custom    eigene Lebensmittel
 
 ## Wichtige Funktionen / Konstanten
 
-- `EXLIB` — Übungs-Bibliothek nach Muskelgruppe, jede Übung `[name, schritt1, schritt2, …]`.
+- `EXLIB` — Übungs-Bibliothek nach Muskelgruppe (~110 Übungen inkl. Po, Bizeps/Trizeps
+  getrennt, Ganzkörper/Zuhause, Mobility), jede Übung `[name, schritt1, schritt2, …]`.
+  Bestehende Übungsnamen NICHT umbenennen (Pläne/Rekorde referenzieren sie per Name).
+- `setScore()` / `checkPRs()` / `prCard()` / `prTxt()` — persönliche Rekorde:
+  bei `kg` zählt geschätztes 1RM (Epley), sonst beste Wdh./Sek./Min. Neue Rekorde werden
+  beim Speichern erkannt (`state.lastPRs` → Anzeige in `viewDone`), Liste unter
+  Training → Verlauf, Anzeige „★ Rekord" in der Übungskarte.
+- `NAVICONS` / `kcalRing()` — monochrome SVG-Icons in der Tab-Leiste, Kalorien-Ring im Essen-Tab.
 - `FOODS` / `FKEYS` / `foodObj()` — Lebensmittel-Datenbank.
 - `PORTIONS` — optionale Portionsvorlagen je Lebensmittel `{ name: [[label, gramm], …] }`.
   Werden im Food-Picker als Ein-Tipp-Chips angezeigt.
