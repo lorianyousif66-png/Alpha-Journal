@@ -14,9 +14,13 @@ Abhängigkeiten. Sie wird auf GitHub Pages gehostet und auf dem Handy per
 
 ## Harte Regeln (nicht brechen)
 
-1. **Alles bleibt in EINER Datei** `index.html` (HTML + CSS + Vanilla-JS inline).
+1. **Die App-Logik bleibt in EINER Datei** `index.html` (HTML + CSS + Vanilla-JS inline).
    Kein npm, kein React, keine externen Libraries außer der Google-Fonts-Einbindung
    für "Inter". Kein Build-Schritt.
+   *Ausnahme (bewusst, Phase 2 aus dem Backlog):* für echte Offline-Nutzung liegen
+   drei kleine statische Begleitdateien daneben — `manifest.json`, `icon.svg` und
+   `sw.js` (Service Worker). Diese enthalten **keine** App-Logik, nur PWA-Shell.
+   Keine weiteren Dateien hinzufügen.
 2. **Kein `localStorage`-Ersatz nötig** — läuft echt im Browser, `localStorage` ist
    erlaubt und gewollt (Daten liegen nur auf dem Gerät).
 3. **Design: schlicht, Schwarz-Weiß (monochrom).** Zwei Themes: `obsidian` (dunkel）
@@ -59,11 +63,13 @@ Abhängigkeiten. Sie wird auf GitHub Pages gehostet und auf dem Handy per
 - `training` — Session-Logging (Sätze: Gewicht/Wdh./erledigt), Tag-Wechsel,
   Pausen-Timer, Notizfeld, Übungs-Anleitungen (`<details>`).
 - `essen` — Ernährungs-Tracker: Tagesbedarf vs. Konsum (Makros + Mikros + Wasser),
-  Essen aus Datenbank hinzufügen (`viewFoodPicker`), eigene Lebensmittel.
+  Essen aus Datenbank hinzufügen (`viewFoodPicker`, inkl. Portions-Chips), eigene
+  Lebensmittel, 7-Tage-Wochenverlauf (`weekCard`).
 - `gewicht` — Gewicht eintragen, Verlaufskurve (selbstgezeichnetes SVG), Einträge löschen.
-- `mehr` — Editor/Einstellungen als Akkordeon: Profil, Trainingsplan-Editor
-  (inkl. Übungs-Bibliothek `viewLibrary`), Protein/Pause, Theme, Trainings-Verlauf,
-  Daten-Export/Import/Reset.
+- `mehr` — Editor/Einstellungen als Akkordeon: Profil, **Plan-Assistent** (`wizEditor`,
+  generiert Plan nach Ziel + Tagen), Trainingsplan-Editor (inkl. Übungs-Bibliothek
+  `viewLibrary`), Protein/Pause, Theme, Trainings-Verlauf,
+  Daten sichern (Datei-Download/-Upload + Copy-Export/Import/Reset).
 
 ## localStorage-Keys (`K`-Objekt) — NICHT umbenennen (sonst Datenverlust)
 
@@ -86,6 +92,7 @@ hermes:custom    eigene Lebensmittel
 - **Plan-Tag:** `{ id, label, exercises: [...] }`
 - **Übung:** `{ id, name, sets, reps, unit, steps:[...] }`
   - `unit`: `"kg"` | `"s"` (Sekunden, z. B. Plank) | `"bw"` (Körpergewicht, kein Gewichtsfeld)
+    | `"min"` (Minuten, Cardio — kein Gewichtsfeld)
   - `steps`: kurze Anleitungsschritte (aus der Bibliothek kopiert oder leer)
 - **Session-Log-Übung:** wie Übung, aber `sets: [{ weight, reps, done }]`
 - **Lebensmittel (DB):** kompaktes Array
@@ -97,11 +104,19 @@ hermes:custom    eigene Lebensmittel
 
 - `EXLIB` — Übungs-Bibliothek nach Muskelgruppe, jede Übung `[name, schritt1, schritt2, …]`.
 - `FOODS` / `FKEYS` / `foodObj()` — Lebensmittel-Datenbank.
+- `PORTIONS` — optionale Portionsvorlagen je Lebensmittel `{ name: [[label, gramm], …] }`.
+  Werden im Food-Picker als Ein-Tipp-Chips angezeigt.
 - `NUT` — Nährstoff-Definitionen für die Fortschrittsbalken.
 - `targets()` — berechnet Tagesbedarf aus Profil + aktuellem Gewicht:
   BMR (Mifflin-St Jeor) × Aktivität, ± Ziel; Protein aus `settings.protein` g/kg,
   Fett 0,8 g/kg, Rest Kohlenhydrate; Mikro-Richtwerte nach Geschlecht (DGE, ca.).
+- `weekStats()` / `weekCard()` — 7-Tage-Verlauf (kcal-Balken + Ø kcal/Protein) im Essen-Tab.
+- `PLAN_TEMPLATES` / `generatePlan(focus, days)` — Plan-Assistent unter „Mehr". `focus`:
+  `"aufbau"` (Muskelaufbau) | `"fettabbau"` (+ Cardio-Finisher) | `"beides"`; `days` 2–4.
+  Steuert Wdh.-Bereich, Sätze und Cardio. UI-Zustand liegt in `state.wiz`.
 - `buildLog(dayId)` — erzeugt die Sätze für eine Trainingseinheit.
+- `doDownload()` / `doFileImport()` / `applyImportObj()` — Backup als Datei speichern/laden
+  (zusätzlich zur Copy-Sicherung `doExport`/`doImport`).
 - `render()`, `wire()`, `bar()` (Fortschrittsbalken), `svgChart()` (Gewichtskurve).
 
 ## Fachliche Leitplanken (Trainings-/Ernährungslogik)
@@ -114,15 +129,20 @@ hermes:custom    eigene Lebensmittel
 
 ## Backlog / mögliche nächste Schritte (nur auf Wunsch)
 
-- Mehr Lebensmittel + Suche/Barcode; Portionsvorlagen (Stück/Portion statt nur Gramm).
-- Wochen-/Verlaufsansicht für Kalorien & Makros.
-- PWA härten: echtes `manifest.json` + Service Worker für Offline-Nutzung
-  (nötig für saubere Store-Verpackung via PWABuilder in Phase 2).
+Erledigt: Portionsvorlagen · größere Lebensmittel-DB · Wochen-Verlauf Kalorien/Makros ·
+PWA offline (manifest.json + Service Worker) · Datei-Export/-Import · Plan-Assistent
+(Muskelaufbau/Fettabbau/Beides + Tage 2–4).
+
+Offen:
+- Lebensmittel-Suche per Barcode; noch mehr Einträge.
+- Verlaufsansicht auch für Makros einzeln / längere Zeiträume.
 - Geräte-Sync (aktuell nur lokal) — bewusst später, eigener Schritt.
-- Export als Datei (Download) zusätzlich zur Copy-Sicherung.
 
 ## Deploy
 
-GitHub Pages: `index.html` im Repo-Root, Pages auf Branch `main` `/root`.
-Nach Push ~1 Min live. Auf dem Handy ggf. Cache leeren / App neu öffnen,
-damit Updates erscheinen.
+GitHub Pages: `index.html` (+ `manifest.json`, `icon.svg`, `sw.js`) im Repo-Root,
+Pages auf Branch `main` `/root`. Nach Push ~1 Min live.
+
+**Wichtig bei Updates:** Der Service Worker cached die App-Shell. Nach jeder Änderung
+an `index.html` die `CACHE`-Version in `sw.js` erhöhen (`hermes-v1` → `hermes-v2` …),
+sonst sehen installierte Geräte die alte Version. Auf dem Handy ggf. App neu öffnen.

@@ -1,0 +1,15 @@
+{
+  "name": "Hermes",
+  "short_name": "Hermes",
+  "description": "Training & Ernährung",
+  "lang": "de",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0A0A0A",
+  "theme_color": "#0A0A0A",
+  "start_url": ".",
+  "scope": ".",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
