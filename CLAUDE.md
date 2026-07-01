@@ -21,10 +21,13 @@ Abhängigkeiten. Sie wird auf GitHub Pages gehostet und auf dem Handy per
    drei kleine statische Begleitdateien daneben — `manifest.json`, `icon.svg` und
    `sw.js` (Service Worker). Diese enthalten **keine** App-Logik, nur PWA-Shell.
    Keine weiteren Dateien hinzufügen.
-   *Externe Runtime-Dienste (keine Libraries, kein Build):* der Barcode-Scanner nutzt
-   die im Browser eingebaute `BarcodeDetector`-API und die **Open Food Facts**-API
-   (`world.openfoodfacts.org`) für die Produktsuche — reiner `fetch`-Aufruf zur
-   Laufzeit, nur online. Kein npm-Paket, keine eingebundene JS-Library.
+   *Externe Runtime-Dienste (kein Build):* der Barcode-Scanner nutzt die **Open Food
+   Facts**-API (`world.openfoodfacts.org`) für die Produktsuche — reiner `fetch`-Aufruf,
+   nur online. Zum Kamera-Lesen: Android verwendet die eingebaute `BarcodeDetector`-API;
+   auf iPhone/Safari (kein `BarcodeDetector`) wird **ZXing** (`@zxing/library`) bei Bedarf
+   einmalig vom CDN (`cdn.jsdelivr.net`) nachgeladen und danach vom Service Worker offline
+   gecacht. Das ist die **einzige bewusst erlaubte JS-Library** (kein npm/Build, nur ein
+   `<script>`-Nachladen zur Laufzeit) — sonst keine Libraries einbauen.
 2. **Kein `localStorage`-Ersatz nötig** — läuft echt im Browser, `localStorage` ist
    erlaubt und gewollt (Daten liegen nur auf dem Gerät).
 3. **Design: schlicht, Schwarz-Weiß (monochrom).** Zwei Themes: `obsidian` (dunkel）
@@ -114,9 +117,10 @@ hermes:custom    eigene Lebensmittel
 - `PORTIONS` — optionale Portionsvorlagen je Lebensmittel `{ name: [[label, gramm], …] }`.
   Werden im Food-Picker als Ein-Tipp-Chips angezeigt.
 - `allFoods()` — Custom-Lebensmittel zuerst, dann `FOODS` (frisch gescannte/eigene oben).
-- `openScanner()` / `lookupBarcode(code)` / `initScanner()` — Barcode-Scan (`BarcodeDetector`
-  + Open Food Facts). Gefundenes Produkt wird als Custom-Food (`hermes:custom`) gespeichert.
-  Overlay `#scanoverlay` liegt statisch im Body und wird imperativ gesteuert (nicht via `render()`).
+- `openScanner()` / `loadZXing()` / `lookupBarcode(code)` / `initScanner()` — Barcode-Scan.
+  Kamera: `BarcodeDetector` (Android) bzw. ZXing `decodeFromConstraints` (iPhone). Treffer
+  → Open Food Facts → Custom-Food (`hermes:custom`). Overlay `#scanoverlay` liegt statisch
+  im Body und wird imperativ gesteuert (nicht via `render()`).
 - `NUT` — Nährstoff-Definitionen für die Fortschrittsbalken.
 - `targets()` — berechnet Tagesbedarf aus Profil + aktuellem Gewicht:
   BMR (Mifflin-St Jeor) × Aktivität, ± Ziel; Protein aus `settings.protein` g/kg,

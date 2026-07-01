@@ -663,25 +663,38 @@ function addFood(idx,grams){
  arr.push({name:f.name,grams:g,n});state.foodLog={...state.foodLog,[day]:arr};save(K.food,state.foodLog);
 }
 
-/* ---- Barcode-Scanner (Open Food Facts) ---- */
-let scanStream=null,scanTimer=null;
+/* ---- Barcode-Scanner (Open Food Facts) ----
+   Android: eingebaute BarcodeDetector-API. iPhone & Co.: ZXing-Bibliothek (bei Bedarf
+   einmal aus dem CDN nachgeladen, danach vom Service Worker offline gecacht). */
+let scanStream=null,scanTimer=null,zxingReader=null;
+const ZXING_SRC="https://cdn.jsdelivr.net/npm/@zxing/library@0.21.3/umd/index.min.js";
 function setScanStatus(t){const el=document.getElementById("scanStatus");if(el)el.textContent=t;}
+function loadZXing(){return new Promise((resolve,reject)=>{if(window.ZXing)return resolve();const s=document.createElement("script");s.src=ZXING_SRC;s.onload=()=>resolve();s.onerror=()=>reject(new Error("zxing"));document.head.appendChild(s);});}
 async function openScanner(){
  const ov=document.getElementById("scanoverlay");ov.classList.add("on");
  const mi=document.getElementById("scanManual");if(mi)mi.value="";
- if(!("BarcodeDetector"in window)){setScanStatus("Live-Scan geht in diesem Browser nicht — bitte Barcode-Nummer unten eintippen.");return;}
+ const v=document.getElementById("scanvideo");
  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){setScanStatus("Keine Kamera verfügbar — bitte Barcode-Nummer unten eintippen.");return;}
- setScanStatus("Barcode ruhig vor die Kamera halten …");
+ setScanStatus("Kamera wird gestartet …");
+ if("BarcodeDetector"in window){
+  try{
+   scanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}});
+   v.srcObject=scanStream;await v.play();
+   let detector;try{detector=new BarcodeDetector({formats:["ean_13","ean_8","upc_a","upc_e","code_128"]});}catch{detector=new BarcodeDetector();}
+   setScanStatus("Barcode ruhig vor die Kamera halten …");
+   scanTimer=setInterval(async()=>{try{const codes=await detector.detect(v);if(codes&&codes.length){const code=codes[0].rawValue;stopCamera();lookupBarcode(code);}}catch{}},500);
+  }catch(e){setScanStatus("Kamerazugriff abgelehnt oder nicht möglich — bitte Barcode-Nummer unten eintippen.");}
+  return;
+ }
+ // iPhone & Co.: ZXing
  try{
-  scanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}});
-  const v=document.getElementById("scanvideo");v.srcObject=scanStream;await v.play();
-  let detector;try{detector=new BarcodeDetector({formats:["ean_13","ean_8","upc_a","upc_e","code_128"]});}catch{detector=new BarcodeDetector();}
-  scanTimer=setInterval(async()=>{
-   try{const codes=await detector.detect(v);if(codes&&codes.length){const code=codes[0].rawValue;stopCamera();lookupBarcode(code);}}catch{}
-  },500);
- }catch(e){setScanStatus("Kamerazugriff abgelehnt oder nicht möglich — bitte Barcode-Nummer unten eintippen.");}
+  await loadZXing();
+  zxingReader=new ZXing.BrowserMultiFormatReader();
+  setScanStatus("Barcode ruhig vor die Kamera halten …");
+  await zxingReader.decodeFromConstraints({video:{facingMode:{ideal:"environment"}}},v,(result,err)=>{if(result){const code=result.getText();stopCamera();lookupBarcode(code);}});
+ }catch(e){setScanStatus("Scanner braucht beim ersten Mal Internet — sonst bitte Barcode-Nummer unten eintippen.");}
 }
-function stopCamera(){if(scanTimer){clearInterval(scanTimer);scanTimer=null;}if(scanStream){scanStream.getTracks().forEach(t=>t.stop());scanStream=null;}const v=document.getElementById("scanvideo");if(v)v.srcObject=null;}
+function stopCamera(){if(scanTimer){clearInterval(scanTimer);scanTimer=null;}if(zxingReader){try{zxingReader.reset();}catch{}zxingReader=null;}if(scanStream){scanStream.getTracks().forEach(t=>t.stop());scanStream=null;}const v=document.getElementById("scanvideo");if(v)v.srcObject=null;}
 function closeScanner(){stopCamera();const ov=document.getElementById("scanoverlay");if(ov)ov.classList.remove("on");}
 async function lookupBarcode(code){
  code=String(code||"").trim();if(!code){setScanStatus("Bitte eine Barcode-Nummer eingeben.");return;}
