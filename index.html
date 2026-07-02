@@ -217,6 +217,13 @@ details.steps li{font-size:13px;line-height:1.5;color:var(--text);margin-bottom:
 .reward-check path{fill:none;stroke:var(--text);stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;stroke-dashoffset:60;animation:rw-draw .38s .34s ease forwards;}
 @keyframes rw-draw{to{stroke-dashoffset:0}}
 .reward-quote{font-size:15px;line-height:1.45;font-weight:700;}
+/* Zutaten-Info: Nährwert-Tabelle + Gesundheits-Begründung */
+.nuttable{margin-top:10px;}
+.nutrow{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid var(--hair);font-size:14px;}
+.nutrow:last-child{border-bottom:none;}
+.nutrow .nv{font-weight:700;white-space:nowrap;}
+.health-list{margin:8px 0 0;padding-left:18px;}
+.health-list li{font-size:14px;line-height:1.5;margin-bottom:7px;}
 .exm-head{display:flex;justify-content:space-between;align-items:center;gap:10px;}
 .exm-title{font-weight:800;font-size:19px;}
 .exm-group{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;}
@@ -931,7 +938,7 @@ function viewFoodPicker(){
  const items=foods.map((f,i)=>{
   const pt=PORTIONS[f.name];
   const chips=pt?`<div class="portrow">${pt.map(([l,g])=>`<button class="portchip" data-portadd="${i}|${g}">+ ${esc(l)}</button>`).join("")}</div>`:"";
-  return `<div class="pick-item food-item" data-name="${esc(f.name.toLowerCase())}"><div class="pick-left"><div class="pn">${esc(f.name)}</div><div class="pmeta">${Math.round(f.n.kcal)} kcal · ${f.n.p}g P · ${f.n.c}g KH · ${f.n.f}g F / 100g</div>${chips}</div><div class="gramrow"><input class="gram-inp" type="number" inputmode="numeric" value="100" data-gram="${i}"><button class="pick-add" data-addfood="${i}">+</button></div></div>`;
+  return `<div class="pick-item food-item" data-name="${esc(f.name.toLowerCase())}"><div class="pick-left"><div class="pn" data-foodinfo="${i}">${esc(f.name)} <span class="ex-i">ⓘ</span></div><div class="pmeta">${Math.round(f.n.kcal)} kcal · ${f.n.p}g P · ${f.n.c}g KH · ${f.n.f}g F / 100g</div>${chips}</div><div class="gramrow"><input class="gram-inp" type="number" inputmode="numeric" value="100" data-gram="${i}"><button class="pick-add" data-addfood="${i}">+</button></div></div>`;
  }).join("");
  const banner=state.scanAdded?`<div class="scan-added">✓ „${esc(state.scanAdded)}" angelegt — oben in der Liste, Menge wählen und + tippen.</div>`:"";
  return `<div class="stack">
@@ -957,6 +964,30 @@ function addFood(idx,grams,meal){
  const n={};FKEYS.forEach(k=>n[k]=(f.n[k]||0)*g/100);
  const day=todayKey();const arr=state.foodLog[day]?[...state.foodLog[day]]:[];
  arr.push({name:f.name,grams:g,meal:meal||state.mealFor,n});state.foodLog={...state.foodLog,[day]:arr};save(K.food,state.foodLog);
+}
+/* Gesundheits-Begründung aus dem Nährstoffprofil (pro 100 g) — skaliert auf alle
+   Lebensmittel inkl. eigener. Grenzwerte grob nach „nennenswerter Menge je 100 g". */
+function foodHealth(f){
+ const n=f.n||{},out=[];
+ if((n.p||0)>=15)out.push(["Eiweißreich","Viel Protein — der Baustein für Muskelaufbau und -erhalt, hält außerdem lange satt."]);
+ if((n.fib||0)>=5)out.push(["Ballaststoffreich","Fördert die Verdauung, hält lange satt und stabilisiert den Blutzucker."]);
+ if((n.vc||0)>=15)out.push(["Vitamin C","Stärkt das Immunsystem und schützt die Zellen als Antioxidans."]);
+ if((n.vd||0)>=1)out.push(["Vitamin D","Wichtig für Knochen, Muskelkraft und das Immunsystem."]);
+ if((n.ca||0)>=120)out.push(["Calcium","Baut Knochen und Zähne auf und hält sie stark."]);
+ if((n.fe||0)>=2)out.push(["Eisen","Für den Sauerstofftransport im Blut — beugt Müdigkeit vor."]);
+ if((n.mg||0)>=50)out.push(["Magnesium","Unterstützt Muskeln, Nerven und den Energiestoffwechsel."]);
+ if((n.k||0)>=300)out.push(["Kalium","Reguliert Blutdruck und Flüssigkeitshaushalt, wichtig für die Muskeln."]);
+ if((n.kcal||0)<=60&&(n.f||0)<5)out.push(["Kalorienarm","Wenig Kalorien bei viel Volumen — ideal zum Sattessen im Defizit."]);
+ return out;
+}
+function openFoodInfo(idx){
+ const f=allFoods()[idx];if(!f)return;
+ const rows=NUT.filter(x=>x.k!=="water").map(x=>{const v=f.n[x.k]||0;const val=x.k==="kcal"?Math.round(v):Math.round(v*10)/10;return `<div class="nutrow"><span>${x.l}</span><span class="nv">${val} ${x.u}</span></div>`;}).join("");
+ const h=foodHealth(f);
+ const health=h.length?`<ul class="health-list">${h.map(([t,d])=>`<li><b>${esc(t)}:</b> ${esc(d)}</li>`).join("")}</ul>`:`<p class="muted sm" style="margin:8px 0 0">Sticht bei keinem Nährstoff besonders hervor — in Maßen Teil einer ausgewogenen Ernährung.</p>`;
+ document.getElementById("exmodalCard").innerHTML=`<div class="exm-head"><div class="exm-title">${esc(f.name)}</div><button class="iconbtn" id="exmClose">✕</button></div><div class="exm-group">Nährwerte pro 100 g</div><div class="nuttable">${rows}</div><div class="exm-sec">Warum gut für dich</div>${health}<p class="muted sm" style="margin-top:12px">Nährwerte sind Näherungswerte pro 100 g.</p>`;
+ document.getElementById("exmodal").classList.add("on");
+ document.getElementById("exmClose").onclick=closeExInfo;
 }
 
 /* ---- Barcode-Scanner (Open Food Facts) ----
@@ -1150,6 +1181,7 @@ function wire(){
  main.querySelectorAll("[data-water]").forEach(b=>b.onclick=()=>{const day=todayKey();const cur=state.waterLog[day]||0;state.waterLog={...state.waterLog,[day]:Math.max(0,cur+ +b.dataset.water)};save(K.water,state.waterLog);render();});
  main.querySelectorAll("[data-addfood]").forEach(b=>b.onclick=()=>{const i=+b.dataset.addfood;const gi=main.querySelector(`[data-gram="${i}"]`);addFood(i,gi?parseFloat(gi.value):100,state.mealFor);showReward();});
  main.querySelectorAll("[data-portadd]").forEach(b=>b.onclick=()=>{const[i,g]=b.dataset.portadd.split("|");addFood(+i,+g,state.mealFor);showReward();});
+ main.querySelectorAll("[data-foodinfo]").forEach(el=>el.onclick=()=>openFoodInfo(+el.dataset.foodinfo));
  const search=document.getElementById("foodSearch");if(search)search.oninput=()=>{const q=search.value.toLowerCase();main.querySelectorAll(".food-item").forEach(it=>{it.style.display=it.dataset.name.includes(q)?"":"none";});};
  const ac=main.querySelector("[data-addcustom]");if(ac)ac.onclick=()=>{const nm=(document.getElementById("cfName").value||"").trim();if(!nm)return;const kcal=+document.getElementById("cfKcal").value||0;const p=+document.getElementById("cfP").value||0;const c=+document.getElementById("cfC").value||0;const f=+document.getElementById("cfF").value||0;const n={};FKEYS.forEach(k=>n[k]=0);n.kcal=kcal;n.p=p;n.c=c;n.f=f;state.customFoods=[...state.customFoods,{name:nm,n}];save(K.custom,state.customFoods);render();};
  // Gewicht
